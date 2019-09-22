@@ -82,7 +82,7 @@ def plot_graph(emperical, n_list):
     plt.plot(n_list, emperical)
     plt.xlabel('n - axis')
     plt.ylabel('time - axis')
-    plt.show()
+    plt.show() 
 
 
 def main():
