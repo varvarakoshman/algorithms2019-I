@@ -70,14 +70,13 @@ def golden_section(function, interval):
             y_2 = y_1
             x_1 = a + gr * (b - a)
             y_1 = function(x_1)
-            increment_f_calls()
         else:
             a = x_1
             x_1 = x_2
             y_1 = y_2
             x_2 = b + gr2 * (b - a)
             y_2 = function(x_2)
-            increment_f_calls()
+        increment_f_calls()
         increment_iterations()
     return a, b
 

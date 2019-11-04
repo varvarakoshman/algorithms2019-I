@@ -4,6 +4,7 @@ import scipy.optimize as sp
 import functools as fun
 
 # task 2
+from Scripts.task1 import golden_section
 
 alpha = np.random.rand(1)
 betta = np.random.rand(1)
@@ -13,6 +14,12 @@ linear_reg_f = lambda x, a, b: a * x + b
 rational_reg_f = lambda x, a, b: a / (1 + b * x)
 stop_condition = lambda a_old, a_new, b_old, b_new: np.linalg.norm(
     np.array([a_old, b_old]) - np.array([a_new, b_new])) < epsilon
+
+functional2 = lambda regression_one_fixed, changing: np.sum(np.array(
+    [np.square(regression_one_fixed(x=dataset[0][i]) - dataset[1][i][0], a=changing) for i in range(len(dataset[0]))]))
+
+functional22 = lambda regression_one_fixed, changing: np.sum(np.array(
+    [np.square(regression_one_fixed(x=dataset[0][i]) - dataset[1][i][0], b=changing) for i in range(len(dataset[0]))]))
 
 
 class NM(object):
@@ -43,6 +50,13 @@ def gauss_method(regression_f):
     b_old = np.random.rand(1)[0]
     iterations = 0
     while True:
+        # a, b = golden_section(fun.partial(functional2, regression_one_fixed=fun.partial(regression_f, b=b_old)),
+        #                     (-0.5, 1.5))
+        # a_new = 0.5 * (a + b)
+
+        # a, b = golden_section(fun.partial(functional22, regression_one_fixed=fun.partial(regression_f, a=a_new)),
+        #                     (-0.5, 1.5))
+        # b_new = 0.5 * (a + b)
         a_new = minimize_f(regression_f, (None, b_old))  # b fixed
         b_new = minimize_f(regression_f, (a_new, None))  # new a fixed
         if stop_condition(a_old, a_new, b_old, b_new):
@@ -120,14 +134,15 @@ def is_converged(f_values):
 
 def plot_dataset(regression, optimal_implemented, optimal_python, optimal_implemented_nm):
     x = dataset[0]
-    initial = regression[1](x, alpha, betta)
     result_impl_gauss = regression[1](x, np.array(optimal_implemented[0]), np.array(optimal_implemented[1]))
     result_py_nm = regression[1](x, np.array(optimal_python[0]), np.array(optimal_python[1]))
     result_impl_nm = regression[1](x, np.array(optimal_implemented_nm[0]), np.array(optimal_implemented_nm[1]))
     plt.plot(x, dataset[1], 'o')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.plot(x, initial, label='initial')
+    if regression[0] == 'linear':
+        initial = regression[1](x, alpha, betta)
+        plt.plot(x, initial, label='initial')
     plt.plot(x, result_impl_gauss, label='Gauss')
     plt.plot(x, result_py_nm, label='NM py')
     plt.plot(x, result_impl_nm, label='NM impl')
@@ -166,9 +181,10 @@ def main():
     regressions = [('linear', linear_reg_f), ('rational', rational_reg_f)]
     for regression in regressions:
         optimal_implemented_gauss, gauss_iterations = gauss_method(regression[1])
-        python_nm_res = sp.minimize(fun.partial(functional, regression=regression[1]), np.array((0, 0)),
+        python_nm_res = sp.minimize(fun.partial(functional, regression=regression[1]),
+                                    np.array((np.random.rand(1)[0], np.random.rand(1)[0])),
                                     method="Nelder-Mead",
-                                    tol=1e-3)
+                                    options={'xtol': 1e-3, 'ftol': 1e-3})
         optimal_implemented_nm, nm_iterations = nelder_mead_method(regression[1])
         plot_dataset(regression, optimal_implemented_gauss, python_nm_res.x, optimal_implemented_nm[0])
         print("coefficients initial: ", alpha[0], betta[0])
