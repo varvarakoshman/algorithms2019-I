@@ -127,9 +127,9 @@ def main():
         optimal_gd, gd_iterations = steepest_gradient_descent(functionals[i][1])
         # optimal_gd, gd_iterations = gradient_descent(functionals[i][1]) # долго сходится
         python_cg_res = sp.minimize(functionals[i][0],
-                                     np.array((np.random.rand(1)[0], np.random.rand(1)[0])),
-                                     method="CG",
-                                     options={'gtol': epsilon})
+                                    np.array((np.random.rand(1)[0], np.random.rand(1)[0])),
+                                    method="CG",
+                                    options={'gtol': epsilon})
         optimal_cg = python_cg_res.x
         cg_iterations = python_cg_res.nit
         # optimal_newton, newton_iterations = newton_method(functionals[i])
@@ -151,13 +151,17 @@ def main():
         plot_dataset(regressions[i], optimal_gd, optimal_cg, optimal_newton, optimal_lm)
         print("coefficients initial: ", alpha[0], betta[0])
         print("coefficients with Gradient Descent method (for {} regression) ({} iterations): "
-          .format(regressions[i][0], gd_iterations), optimal_gd[0], optimal_gd[1])
+              .format(regressions[i][0], gd_iterations), optimal_gd[0], optimal_gd[1])
         print("coefficients with Conjugate Gradient Descent method (for {} regression) ({} iterations): "
-           .format(regressions[i][0], cg_iterations), optimal_cg[0], optimal_cg[1])
+              .format(regressions[i][0], cg_iterations), optimal_cg[0], optimal_cg[1])
         print("coefficients with Newton method (for {} regression) ({} iterations): "
-          .format(regressions[i][0], newton_iterations), optimal_newton[0], optimal_newton[1])
+              .format(regressions[i][0], newton_iterations), optimal_newton[0], optimal_newton[1])
         print("coefficients with Levenberg-Marquardt algorithm (for {} regression) ({} iterations): "
-          .format(regressions[i][0], lm_iterations), optimal_lm[0], optimal_lm[1])
+              .format(regressions[i][0], lm_iterations), optimal_lm[0], optimal_lm[1])
+        print("functional value at found point (gd)", functionals[i][0](optimal_gd))
+        print("functional value at found point (cg)", functionals[i][0](optimal_cg))
+        print("functional value at found point (newton)", functionals[i][0](optimal_newton))
+        print("functional value at found point (lm)", functionals[i][0](optimal_lm))
         print()
 
 
